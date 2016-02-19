@@ -1,15 +1,4 @@
-var moment = require('moment');
-var internals = {};
-
-
-internals.now = function() {
-
-    return new Date().getTime();
-};
-
-
-internals.timers = {};
-
+var timers = {};
 
 /**
  * Start timer.
@@ -21,13 +10,7 @@ exports.start = function(timer_name, verbose) {
         console.log('[TIMER] start - %s', timer_name);
     }
 
-    internals.timers[timer_name] = {
-        'start': internals.now(),
-        'stop': undefined,
-        'delta': undefined
-    };
-
-    return internals.timers[timer_name];
+    timers[timer_name] = Date.now();
 };
 
 
@@ -36,24 +19,14 @@ exports.start = function(timer_name, verbose) {
  *
  */
 exports.stop = function(timer_name, verbose) {
-
-    var ms;
-
-    if (verbose === true) {
-        console.log('[TIMER] stop  - %s', timer_name);
-    }
-
-    var timer = internals.timers[timer_name];
-    timer.stop = internals.now();
-    timer.delta = timer.stop - timer.start;
+    
+    var delta = Date.now() - timers[timer_name];
 
     if (verbose === true) {
-        console.log('[TIMER] delta - %s: %s (%s seconds)', timer_name, timer.delta, timer.delta/1000);
+        console.log('[TIMER] stop - %s: %s (%s seconds)', timer_name, delta, delta/1000);
     }
+    
+    delete timers[timer_name];
 
-    ms = timer.delta;
-
-    delete internals.timers[timer_name];
-
-    return ms;
+    return delta;
 };
